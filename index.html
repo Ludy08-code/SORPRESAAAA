@@ -381,7 +381,7 @@ $('#candle').onkeydown=e=>{ if(e.key==='Enter'||e.key===' ') blow(); };
 
 /* ---------- escena 2: estrellas que forman corazón + texto ---------- */
 const cv=$('#stars'), cx=cv.getContext('2d');
-let P=[], mouse={x:-999,y:-999}, running=false, started=false, HC={x:0,y:0}, SW=0, SH=0;
+let P=[], mouse={x:-999,y:-999,t:0}, running=false, started=false, HC={x:0,y:0}, SW=0, SH=0;
 /* estrella chiquita: núcleo nítido + brillo suave + destello en cruz */
 const sprite=document.createElement('canvas'); sprite.width=sprite.height=64;
 (()=>{ const g=sprite.getContext('2d'), r=g.createRadialGradient(32,32,0,32,32,32);
@@ -452,7 +452,7 @@ function frame(t){
     if(p.h){ tx=HC.x+(p.tx-HC.x)*beat; ty=HC.y+(p.ty-HC.y)*beat; }
     const w=p.free?3:(p.h?1.6:.6);          /* el texto casi no se mueve para que se lea */
     tx+=Math.sin(t/900+p.ph)*w; ty+=Math.cos(t/800+p.ph)*w;
-    const dx=p.x-mouse.x, dy=p.y-mouse.y, dist=Math.hypot(dx,dy)||1, near=dist<80;
+    const dx=p.x-mouse.x, dy=p.y-mouse.y, dist=Math.hypot(dx,dy)||1, near=p.free && dist<80 && (t-mouse.t<600);
     if(near){ tx=p.x+dx/dist*50; ty=p.y+dy/dist*50; }
     const k=p.sp*(near?3:1); p.x+=(tx-p.x)*k; p.y+=(ty-p.y)*k;
     const a=.7+.3*Math.sin(t/450+p.ph);
@@ -466,7 +466,7 @@ function startStars(){
   if(!started){ started=true; setTimeout(()=>$('#toGift').classList.add('show'),4500); }
 }
 addEventListener('resize',()=>{ if(running) build(); });
-const mv=e=>{ const p=e.touches?e.touches[0]:e; mouse.x=p.clientX; mouse.y=p.clientY; };
+const mv=e=>{ const p=e.touches?e.touches[0]:e; mouse.x=p.clientX; mouse.y=p.clientY; mouse.t=performance.now(); };
 addEventListener('mousemove',mv); addEventListener('touchmove',mv,{passive:true}); addEventListener('touchend',()=>{mouse.x=mouse.y=-999;});
 $('#toGift').onclick=()=>{ running=false; go('s3'); };
 
